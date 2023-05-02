@@ -1,3 +1,4 @@
+///This structs uses the response from the WeatherData (the struct responsible for turning JSON into a Swift Object) and further formats that data so that it is ready to be displayed on the view controller.
 struct WeatherModel {
     
     let temperature:Double
@@ -17,14 +18,26 @@ struct WeatherModel {
         case 300...321:
             return "cloud.drizzle"
             
-        case 500...531:
+        case 500...531, 771:
             return "cloud.rain"
             
         case 600...622:
             return "cloud.snow"
             
-        case 700...781:
+        case 701, 741...751:
             return "cloud.fog"
+        
+        case 711:
+            return "smoke"
+            
+        case 721:
+            return "sun.haze"
+            
+        case 731, 761:
+            return "sun.dust"
+            
+        case 781:
+            return "tornado"
             
         case 801...804:
             return "cloud"

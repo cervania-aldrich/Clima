@@ -14,10 +14,42 @@
             filePath = "Clima/Model/WeatherModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "31"
-            endingLineNumber = "31"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "conditionName"
             landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "05CDA06D-6136-4EB4-AC44-DBD30877D90C - 47e0548d2cebcdc0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Clima.WeatherModel.conditionName.getter : Swift.String"
+                  moduleName = "Clima"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aldrichcervania/Documents/Swift%20&amp;%20iOS%20Development/Review/Section%2013/Clima-iOS13/Clima/Model/WeatherModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45"
+                  offsetFromSymbolStart = "1372">
+               </Location>
+               <Location
+                  uuid = "05CDA06D-6136-4EB4-AC44-DBD30877D90C - 47e0548d2cebcc23"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Clima.WeatherModel.conditionName.getter : Swift.String"
+                  moduleName = "Clima"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/aldrichcervania/Documents/Swift%20&amp;%20iOS%20Development/Review/Section%2013/Clima-iOS13/Clima/Model/WeatherModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "46"
+                  endingLineNumber = "46"
+                  offsetFromSymbolStart = "1372">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

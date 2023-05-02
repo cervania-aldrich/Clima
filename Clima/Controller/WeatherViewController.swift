@@ -1,13 +1,13 @@
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
     @IBOutlet weak var conditionImageView: UIImageView! //Images come from SF Symbols
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
-    let weatherManager = WeatherManager()
+    var weatherManager = WeatherManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,6 +16,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         view.addGestureRecognizer(tap) //Add the tap gesture to the screen
         
         searchTextField.delegate = self //Assign the current class as the delegate
+        weatherManager.delegate = self
         
     }
     
@@ -66,6 +67,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
             textField.placeholder = "Please enter a city name"
             return false //Keep the keyboard where it is until the user as entered a city name.
         }
+    }
+    
+    func didUpdateWeather(_ weather: WeatherModel) {
+        print(weather.temperatureString)
     }
     
     

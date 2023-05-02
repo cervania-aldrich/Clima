@@ -1,7 +1,14 @@
 import Foundation
 
+///The requirements that the conforming type must implement. Here we have function named didUpdateWeather. Therefore, the conforming type must implement this method, such that the delegate creates the function and the WeatherManager calls the function.
+protocol WeatherManagerDelegate {
+    func didUpdateWeather(_ weather:WeatherModel)
+}
+
+///A struct that handles the networking process. Requesting information from the api, and then using the native JSON decoder to parse that JSON file in a Swift Object. 
 struct WeatherManager {
     
+    var delegate: WeatherManagerDelegate?
     
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather"
     let apiKey = "a210b6f91c665d2db9eb566589c6c2aa"
@@ -54,8 +61,20 @@ struct WeatherManager {
             }
             
             if let safeData = data {
-                parseJSON(safeData)
-                
+                if let weather = parseJSON(safeData) { //At this point, we should have the JSON as a Swift Object.
+                    
+                    //Now, what do we want to do with the weather Swift Object? Well...
+                    
+                    //Send this weather object back to the WeatherViewController so we can use the data there to change the UI accordingly!
+                    
+                    //One method is to initialise the WeatherViewController here, and call a function that takes the weather object as one of its parameters (after creating it in the WeatherViewController). The disadvantage of this method is that it's not reusable.
+                    
+                    //Hence the secoond method, use the delegate design pattern! Also worth noting, since Swift 5.3, Closures can now implicity refer to self if self is an instance of a struct (or enum), therefore in this case, that's why we don't need to write self.delegate.
+                    
+                    delegate?.didUpdateWeather(weather)
+                    
+                    
+                }
             }
             
         }
@@ -74,26 +93,33 @@ struct WeatherManager {
      3. Use decode method. Note that the first parmeter requires the type of the data itself, not the name of the type. The second parameter is the data we want to encode.
      4. decode can throw, which means we must mark it with a try keyword, and a do/catch block. Also it returns, so store a variable to this result. (Also, try to print out the decoded data to the console to test if the data is accurate and if the code works so far).
      5. Now that we have decoded the JSON data, we should store this data in a WeatherModel, so that we can put the data in our UI.
+     6. Return the weatherModel object to where we parsed the JSON, i.e the URLSession task.
      */
     
-    func parseJSON(_ weatherData: Data){
+    func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         
         do {
-            let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
+            let decodedData = try decoder.decode(WeatherData.self, from: weatherData) //Decoding the JSON file from OpenWeather to a Swift object.
             
             //All the data we want from the decodedData is as follows
             
-            let id = decodedData.weather[0].id
-            let temp = decodedData.main.temp
-            let name = decodedData.name
+            let id = decodedData.weather[0].id //Reference to the 'id' data from the JSON response. (To change the weather icon according to the weather condition)
+            let temp = decodedData.main.temp //Reference to the 'temp' data from the JSON response. (To display the temperature)
+            let name = decodedData.name //Reference to the 'name' data from the JSON response. (To display the city name)
             
             let weather = WeatherModel(temperature: temp, cityName: name, conditionID: id)
             
-            print(weather.temperatureString)
+            //print(weather.temperatureString)
+            
+            //Now that we have the weather data as a Swift Object, return it back to the URLSesion task.
+            //The return type is optional because we want to return a nil object if any errors occur, therefore in order for a value to hold either a nil or a stored value, we must use optionals.
+            
+            return weather
             
         } catch {
             print(error)
+            return nil //Since we don't want to return any objects, we should return nil. Therefore the output of this function must be set as an optional.
         }
     }
     
