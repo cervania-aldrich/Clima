@@ -39,6 +39,8 @@ struct WeatherManager {
      2. Create a URLSession.
      3. Create a task for the URLSession.
      4. Start the task.
+     
+     - parameter urlString: Refers to the URL used to request the data to the openweather API. (Analogous to using the address bar of a browser before pressing enter for a URL)
     */
     func sendRequest(with urlString: String) {
         
@@ -75,6 +77,7 @@ struct WeatherManager {
                     delegate?.didUpdateWeather(self, weather)
                     
                     
+                    
                 }
             }
             
@@ -95,8 +98,9 @@ struct WeatherManager {
      4. decode can throw, which means we must mark it with a try keyword, and a do/catch block. Also it returns, so store a variable to this result. (Also, try to print out the decoded data to the console to test if the data is accurate and if the code works so far).
      5. Now that we have decoded the JSON data, we should store this data in a WeatherModel, so that we can put the data in our UI.
      6. Return the weatherModel object to where we parsed the JSON, i.e the URLSession task.
+     
+     - parameter weatherData: Refers to the data being retrieved by openweather in its JSON form. Later in this method, we convert this JSON into a Swift Object using the JSONDecoder object.
      */
-    
     func parseJSON(_ weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         
@@ -111,7 +115,7 @@ struct WeatherManager {
             
             let weather = WeatherModel(temperature: temp, cityName: name, conditionID: id)
             
-            //print(weather.temperatureString)
+            //print(weather.temperatureString) //To test if we are getting the data as a Swift Object, and not in the JSON format.
             
             //Now that we have the weather data as a Swift Object, return it back to the URLSesion task.
             //The return type is optional because we want to return a nil object if any errors occur, therefore in order for a value to hold either a nil or a stored value, we must use optionals.
