@@ -44,7 +44,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         //Search the weather for the city entered in the textField.
         let city = searchTextField.text ?? "London"
         
-        weatherManager.fetchWeather(city)
+        weatherManager.fetchWeather(for: city)
         
         searchTextField.text = "" //Clears the textField so we can enter a new search term.
     }
@@ -69,8 +69,17 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         }
     }
     
-    func didUpdateWeather(_ weather: WeatherModel) {
+    ///This function comes from the WeatherManagerDelegate protocol, where in this conforming class we are providing the actual implemetation for the protocol requirements.
+    ///- parameter weatherManager: The identity of the object that calls this delegate method. It is an Apple naming convention to include this first parameter in your delegate methods. This also makes any properties available to the method.
+    ///- parameter weather: The object that has the information (response) from openweather api as a Swift Object, (after decoding the JSON).
+    func didUpdateWeather(_ weatherManager:WeatherManager, _ weather: WeatherModel) {
         print(weather.temperatureString)
+        print(weather.cityName)
+        print(weather.conditionName)
+    }
+    
+    func didFailWithError(_ weatherManager: WeatherManager, _ error: Error) {
+        print(error)
     }
     
     

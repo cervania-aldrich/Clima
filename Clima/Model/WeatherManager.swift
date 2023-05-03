@@ -2,7 +2,8 @@ import Foundation
 
 ///The requirements that the conforming type must implement. Here we have function named didUpdateWeather. Therefore, the conforming type must implement this method, such that the delegate creates the function and the WeatherManager calls the function.
 protocol WeatherManagerDelegate {
-    func didUpdateWeather(_ weather:WeatherModel)
+    func didUpdateWeather(_ weatherManager:WeatherManager, _ weather:WeatherModel)
+    func didFailWithError(_ weatherManager:WeatherManager, _ error: Error)
 }
 
 ///A struct that handles the networking process. Requesting information from the api, and then using the native JSON decoder to parse that JSON file in a Swift Object. 
@@ -14,7 +15,7 @@ struct WeatherManager {
     let apiKey = "a210b6f91c665d2db9eb566589c6c2aa"
     let unitOfMeasurement = "metric"
     
-    func fetchWeather(_ cityName:String){
+    func fetchWeather(for cityName:String){
         
         //URLComponents already contains the proper percent encoding. Using this object results in more safe code for networking.
         
@@ -26,7 +27,7 @@ struct WeatherManager {
         
         let urlString = urlComponent.url!.absoluteString
         
-        sendRequest(urlString)
+        sendRequest(with: urlString)
         
     }
     
@@ -39,7 +40,7 @@ struct WeatherManager {
      3. Create a task for the URLSession.
      4. Start the task.
     */
-    func sendRequest(_ urlString: String) {
+    func sendRequest(with urlString: String) {
         
         //Create a URL object
         guard let url = URL(string: urlString) else { return }
@@ -51,7 +52,7 @@ struct WeatherManager {
         let task = session.dataTask(with: url) { data, response, error in
             
             if let safeError = error {
-                print(safeError)
+                delegate?.didFailWithError(self, safeError)
                 return
             }
             
@@ -71,7 +72,7 @@ struct WeatherManager {
                     
                     //Hence the secoond method, use the delegate design pattern! Also worth noting, since Swift 5.3, Closures can now implicity refer to self if self is an instance of a struct (or enum), therefore in this case, that's why we don't need to write self.delegate.
                     
-                    delegate?.didUpdateWeather(weather)
+                    delegate?.didUpdateWeather(self, weather)
                     
                     
                 }
@@ -118,7 +119,7 @@ struct WeatherManager {
             return weather
             
         } catch {
-            print(error)
+            delegate?.didFailWithError(self, error)
             return nil //Since we don't want to return any objects, we should return nil. Therefore the output of this function must be set as an optional.
         }
     }
