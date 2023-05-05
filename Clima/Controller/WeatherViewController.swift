@@ -1,4 +1,5 @@
 import UIKit
+import CoreLocation // The framework used to obtain the geographic location and orientation of a device. (See docs for more information)
 
 class WeatherViewController: UIViewController {
     
@@ -6,8 +7,10 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
+    @IBOutlet weak var locationButton: UIButton!
     
     var weatherManager = WeatherManager()
+    var locationManager = CLLocationManager() // The object that is responsible for all location services.
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,12 +20,77 @@ class WeatherViewController: UIViewController {
         
         searchTextField.delegate = self //Assign the current class as the delegate
         weatherManager.delegate = self
+        locationManager.delegate = self //Delegate must be in place before you start any location services.
         
     }
     
-    ///A function that defines the behaviour to dismiss the keyboard, using a method.
+    ///A function that defines the behaviour to dismiss the keyboard.
     @objc func dismissKeyboard (){
         view.endEditing(true)
+    }
+    
+    ///The function where location services are launched.
+    @IBAction func locationButtonPressed(_ sender: UIButton) {
+        
+        DispatchQueue.global().async {
+            if CLLocationManager.locationServicesEnabled(){ //Check if the device location services are enabled.
+                self.locationManager.requestWhenInUseAuthorization() //Request access to location information when using the app.
+                self.locationManager.requestLocation() //Triggers the didUpdateLocations delegate method.
+            }
+        }
+    }
+    
+    
+}
+
+//MARK: - CLLocationManagerDelegate
+
+//According to the apple docs, we must verify that location services are available before we start collecting location data. We do this by instantiating a CLLocationManager object in the class that will handle location updates, and assign the same class as the delegate to CLLocationManagerDelegate protocol. Afterwards, we must request authorization from the users as location data is sensitive personal information.
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    
+    /**
+     Delegate method to check the app's current authorization status to see if a request is necessary.
+     
+     Note that this method is actually deprecrated, and it is the method used to support earlier versions of iOS. From iOS 14+, we should use the new delegate method called locationManagerDidChangeAuthorization. This method is shortly called after CLLocationManager is initialised.
+     */
+    private func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        
+        //Create a switch statement for the status value
+        
+        switch status {
+            
+        case .notDetermined: // Authorization not determined yet.
+            locationManager.requestWhenInUseAuthorization()
+            break
+            
+        case .authorizedWhenInUse: // Location services are available.
+            locationManager.requestLocation()
+            break
+            
+        case .restricted, .denied:  // Location services currently unavailable.
+            // restricted by e.g. parental controls. User can't enable Location Services
+            // user denied your app access to Location Services, but can grant access from the settings
+            break
+
+        default:
+            break
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        guard let currentLocation = locations.last else { return }
+        
+        let lat = currentLocation.coordinate.latitude
+        let lon = currentLocation.coordinate.longitude
+        
+        weatherManager.fetchWeather(lat,lon)
+        
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Error with location")
     }
     
 }
@@ -56,6 +124,7 @@ extension WeatherViewController: UITextFieldDelegate {
         
         searchTextField.text = "" //Clears the textField so we can enter a new search term.
     }
+    
     /**
      A function that defines the behaviour when the user tries to deselect the textField.
      

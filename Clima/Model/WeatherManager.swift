@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 ///The requirements that the conforming type must implement. Here we have function named didUpdateWeather. Therefore, the conforming type must implement this method, such that the delegate creates the function and the WeatherManager calls the function.
 protocol WeatherManagerDelegate {
@@ -22,11 +23,27 @@ struct WeatherManager {
         guard var urlComponent = URLComponents(string: weatherURL) else { return } //Create URL
         urlComponent.scheme = "https"
         urlComponent.queryItems = [URLQueryItem(name: "q", value: cityName),
-                                URLQueryItem(name: "appid", value: apiKey),
-                                URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
+                                   URLQueryItem(name: "appid", value: apiKey),
+                                   URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
         
         let urlString = urlComponent.url!.absoluteString
+        sendRequest(with: urlString)
         
+    }
+    ///The method to fetch the weather of a location using latitude and longitude coordinates.
+    func fetchWeather(_ lat:CLLocationDegrees, _ lon: CLLocationDegrees){
+        
+        let latString = String(format: "%.2f", lat)
+        let lonString = String(format: "%.2f", lon)
+        
+        guard var urlComponent = URLComponents(string: weatherURL) else { return }
+        urlComponent.scheme = "https"
+        urlComponent.queryItems = [URLQueryItem(name: "lat", value: latString),
+                                   URLQueryItem(name: "lon", value: lonString),
+                                   URLQueryItem(name: "appid", value: apiKey),
+                                   URLQueryItem(name: "units", value: unitOfMeasurement)]
+
+        let urlString = urlComponent.url!.absoluteString
         sendRequest(with: urlString)
         
     }
@@ -40,7 +57,7 @@ struct WeatherManager {
      3. Create a task for the URLSession.
      4. Start the task.
      
-     - parameter urlString: Refers to the URL used to request the data to the openweather API. (Analogous to using the address bar of a browser before pressing enter for a URL)
+     - parameter urlString: Refers to the URL used to request the data we want from openweather API. 
     */
     func sendRequest(with urlString: String) {
         
@@ -58,7 +75,9 @@ struct WeatherManager {
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            let acceptableCodes = [200, 201, 202, 203, 304]
+            
+            guard let httpResponse = response as? HTTPURLResponse, acceptableCodes.contains(httpResponse.statusCode) else {
                 print("Error with the response, unexpected status code: \(response!)")
                 return
             }
@@ -75,8 +94,6 @@ struct WeatherManager {
                     //Hence the secoond method, use the delegate design pattern! Also worth noting, since Swift 5.3, Closures can now implicity refer to self if self is an instance of a struct (or enum), therefore in this case, that's why we don't need to write self.delegate.
                     
                     delegate?.didUpdateWeather(self, weather)
-                    
-                    
                     
                 }
             }
