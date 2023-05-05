@@ -1,5 +1,6 @@
 import UIKit
-import CoreLocation // The framework used to obtain the geographic location and orientation of a device. (See docs for more information)
+///The framework used to obtain the geographic location and orientation of a device. Core Location collects data via onboard components such as Wi-Fi, GPS, Bluetooth, magnetometer, barometer, and cellular hardware. In addition to importing CoreLocation, we must provide a reason as to why our app needs the users location information in the info.plist using the "Privacy — Location When In Use Usage Description" key.
+import CoreLocation
 
 class WeatherViewController: UIViewController {
     
@@ -9,8 +10,13 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var locationButton: UIButton!
     
+    ///The object reponsible for the logic of the app.
     var weatherManager = WeatherManager()
-    var locationManager = CLLocationManager() // The object that is responsible for all location services.
+    
+    ///The object that is responsible for all location services.
+    ///
+    ///Creating a CLLocationManager object, as well as making the WeatherViewController conform to the CLLocationManagerDelegate protocol, are the first steps of using Core Location. The next steps to configuring the app to use location services, is to request for authorization from the user and to define what type of location service you desire using the CLLocationManager object. We do this inside the locationButtonPressed().
+    var locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,18 +30,24 @@ class WeatherViewController: UIViewController {
         
     }
     
-    ///A function that defines the behaviour to dismiss the keyboard.
+    ///A function that defines the behaviour to dismiss the keyboard. This function is passed to the action parameter of UITapGestureRecognizer.
     @objc func dismissKeyboard (){
         view.endEditing(true)
     }
-    
-    ///The function where location services are launched.
+
+    /**
+     The function where location services are launched, and it is where we request authorization from the user and define the location service we want to use. Before we do so, it is good to check if location services are enabled by the users device and although this step isn't mandatory, it is still good to check.
+     
+     The type of authorization we are requesting from the user is called "When in use" authorization, which means allowing access to location information when using the app
+     
+     The type of location service we are using is the "requestLocation()." Note there are other location services we could use (see "running the standard location service" topic in CLLocationManager), but requestLocation is what we need for this app because we are only requesting one location, unlike a GPS which is requesting for multiple locations. Now with how apple has designed the Core Location framework, we don't directly access the location information directly from CLLocationManager, instead we use the didUpdateLocations delegate method (from CLLocationManagerDelegate) that contains location object(s) inside of it, and then we can write some code to handle those location objects. See the didUpdateLocations() to see how we handled those location objects!
+     */
     @IBAction func locationButtonPressed(_ sender: UIButton) {
         
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled(){ //Check if the device location services are enabled.
                 self.locationManager.requestWhenInUseAuthorization() //Request access to location information when using the app.
-                self.locationManager.requestLocation() //Triggers the didUpdateLocations delegate method.
+                self.locationManager.requestLocation() //Triggers the associated delegate methods "didUpdateLocations" and "didFailWithError."
             }
         }
     }
@@ -45,12 +57,11 @@ class WeatherViewController: UIViewController {
 
 //MARK: - CLLocationManagerDelegate
 
-//According to the apple docs, we must verify that location services are available before we start collecting location data. We do this by instantiating a CLLocationManager object in the class that will handle location updates, and assign the same class as the delegate to CLLocationManagerDelegate protocol. Afterwards, we must request authorization from the users as location data is sensitive personal information.
-
+///We can't directly access the location information from CLLocationManager, instead, we use one of the methods in the CLLocationManagerDelegate protocol called "didUpdateLocations."
 extension WeatherViewController: CLLocationManagerDelegate {
     
     /**
-     Delegate method to check the app's current authorization status to see if a request is necessary.
+     This is a delegate method to check the app's current authorization status to see if a request is necessary. In the method, we are comparing the switch value with different cases, such as .notDetermined, .authorizedWhenInUse, .restricted and .denied.
      
      Note that this method is actually deprecrated, and it is the method used to support earlier versions of iOS. From iOS 14+, we should use the new delegate method called locationManagerDidChangeAuthorization. This method is shortly called after CLLocationManager is initialised.
      */
@@ -60,11 +71,11 @@ extension WeatherViewController: CLLocationManagerDelegate {
         
         switch status {
             
-        case .notDetermined: // Authorization not determined yet.
+        case .notDetermined:        // Authorization not determined yet.
             locationManager.requestWhenInUseAuthorization()
             break
             
-        case .authorizedWhenInUse: // Location services are available.
+        case .authorizedWhenInUse:  // Location services are available.
             locationManager.requestLocation()
             break
             
@@ -78,17 +89,25 @@ extension WeatherViewController: CLLocationManagerDelegate {
         }
     }
     
+    /**
+     This delegate method is associated with the requestLocation() method, and it is called at requestLocation(). This is where we directly have access to the location information. It's in the locations parameter!
+     
+     In the location object we have access to numerous properties, but the properties we want access to are the latitude and longitude properties. This is because in our API request, the URL requires a lat and lon query so that we can search for a particular city at those coordinates.
+     
+     - parameter locations: An array of location objects. The objects in the array are organized in the order in which they occurred. Therefore, the most recent location update is at the end of the array.
+     */
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        guard let currentLocation = locations.last else { return }
+        guard let mostRecentLocation = locations.last else { return }
         
-        let lat = currentLocation.coordinate.latitude
-        let lon = currentLocation.coordinate.longitude
+        let lat = mostRecentLocation.coordinate.latitude
+        let lon = mostRecentLocation.coordinate.longitude
         
         weatherManager.fetchWeather(lat,lon)
         
     }
     
+    ///This delegate method is also associated with the requestLocation() method, and it must be implemented alongside didUpdateLocations(), as it says in the requestLocation() documentation.
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error with location")
     }
