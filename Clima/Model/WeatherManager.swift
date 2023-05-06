@@ -1,7 +1,7 @@
 import Foundation
 import CoreLocation
 
-///The requirements that the conforming type must implement. Here we have function named didUpdateWeather. Therefore, the conforming type must implement this method, such that the delegate creates the function and the WeatherManager calls the function.
+///The methods that you use to recieve events from making an API call to OpenWeather, such as recieving data, errors and responses of the request.
 protocol WeatherManagerDelegate {
     func didUpdateWeather(_ weatherManager:WeatherManager, _ weather:WeatherModel)
     func didFailWithError(_ weatherManager:WeatherManager, _ error: Error)
