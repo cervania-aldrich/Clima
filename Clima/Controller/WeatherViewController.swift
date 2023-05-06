@@ -92,18 +92,18 @@ extension WeatherViewController: CLLocationManagerDelegate {
     /**
      This delegate method is associated with the requestLocation() method, and it is called at requestLocation(). This is where we directly have access to the location information. It's in the locations parameter!
      
-     In the location object we have access to numerous properties, but the properties we want access to are the latitude and longitude properties. This is because in our API request, the URL requires a lat and lon query so that we can search for a particular city at those coordinates.
+     In the location object we have access to numerous properties, but the properties we want access are the latitude and longitude properties. This is because in our API request, the URL requires a lat and lon query so that we can search for a particular city at those coordinates.
      
      - parameter locations: An array of location objects. The objects in the array are organized in the order in which they occurred. Therefore, the most recent location update is at the end of the array.
      */
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        guard let mostRecentLocation = locations.last else { return }
+        guard let mostRecentLocation = locations.last else { return } // The current location
         
-        let lat = mostRecentLocation.coordinate.latitude
-        let lon = mostRecentLocation.coordinate.longitude
+        let lat = mostRecentLocation.coordinate.latitude //Latitude coordinates
+        let lon = mostRecentLocation.coordinate.longitude //Longitude coordinates
         
-        weatherManager.fetchWeather(lat,lon)
+        weatherManager.fetchWeather(lat,lon) //Add the lat and lon as URL queries for the open weather API. 
         
     }
     

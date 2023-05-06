@@ -30,7 +30,11 @@ struct WeatherManager {
         sendRequest(with: urlString)
         
     }
-    ///The method to fetch the weather of a location using latitude and longitude coordinates.
+    ///The method to fetch the weather of a location using latitude and longitude coordinates. This method is called when the user presses the locationButton which triggered requestLocation(), thus triggering the didUpdateLocations() delegate method in which we now have access to the latitude and longtiude coordinates of the users device, therefore, be able to fetch the weather based on those coordinates.
+    ///
+    ///Use this method to fetch the weather of a particular location based on its latitude and longitude
+    /// - parameter lat: Refers to the latitude, retrieved by didUpdateLocations().
+    /// - parameter lon: Refers to the longitude, retrieved by didUpdateLocations().
     func fetchWeather(_ lat:CLLocationDegrees, _ lon: CLLocationDegrees){
         
         let latString = String(format: "%.2f", lat)
@@ -49,26 +53,40 @@ struct WeatherManager {
     }
     
     /**
-     The function that performs the networking.
+     The function that performs the networking, thus retrieving the weather data we desire from OpenWeather API as a Swift Object to be used in our app.
     
      Networking involves 4 steps:
-     1. Create a URL object.
-     2. Create a URLSession.
-     3. Create a task for the URLSession.
-     4. Start the task.
+     1. Create a URL object. (because this is how we will locate the resources we want from the open weather server)
+     2. Create a URLSession. (because this is the object responsible for coordinating (like a browser) requests for our app).
+     3. Create a task for the URLSession. (because requests are referred to as tasks, and the task we want to perform is to retrieve data from a server)
+     4. Start the task. (because we want to execute this whole process - like pressing enter on the keyboard to search something on google)
+     
+     For further detail, we are making a GET call to a REST API but, this isn't the only way of networking. For example, solutions on Stack Overflow suggest using NSURLSession. Another example is that on freecodecamp, you create a URLSession.shared.dataTask which combines steps 2 and 3. Some even don't use closures.
+     
+     To understand API's, watch "APIs for Beginners 2023 - How to use an API" by freecodecamp on YouTube. It explains what API's are, why its important and how they work.
      
      - parameter urlString: Refers to the URL used to request the data we want from openweather API. 
     */
     func sendRequest(with urlString: String) {
         
-        //Create a URL object
+        ///Step 1 of networking: Create a URL object.
         guard let url = URL(string: urlString) else { return }
         
-        //Create a URLSession.
+        ///Step 2 of networking: Create a URLSession.
         let session = URLSession(configuration: .default)
         
-        //Create a task for the URLSession.
-        let task = session.dataTask(with: url) { data, response, error in
+        /**
+        Step 3 of networking: Create a task for the URLSession.
+        
+        Inside the closure is where we will have access to the data we were requesting from OpenWeather, via the data parameter of the closure. This closure is also a completion handler, which means it is not called immediately, instead, it waits until something has finished (in our case, that is to retrieve the data from OpenWeather, which could take time due to your internet connection) and then, the completion handler is called. Once the completion handler is called, only then do we have access to the data we were requesting.
+        
+        Great! Now we have our data, but the next problem is that our data is in a JSON format (A format for transferring data across the web). In order to use the data in our app, we must convert this JSON format into a Swift Object. This process is called "parsing JSON." Therefore, using the data object, we shall parse this (JSON) data using the JSONDecoder object. (More details on the implementation in parseJSON(weatherData:) function)
+         
+        Once we have successfully parsed the JSON data and stored it as a Swift Object (namely the Weather Model), we will use the data in this model to change the UI of our app.
+         
+         Just in case there was an error that occured, we shall capture that error and pass it to the WeatherManagerDelegate. Additionally, if there was a non-acceptable HTTP response code (values that aren't in the acceptableCodes array, we shall pass this information to the WeatherManagerDelegate too.
+        */
+        let task = session.dataTask(with: url) { data, response, error in //Perform the task using the URL we created from step 1, and execute the completion handler.
             
             if let safeError = error {
                 delegate?.didFailWithError(self, safeError)
@@ -85,13 +103,13 @@ struct WeatherManager {
             if let safeData = data {
                 if let weather = parseJSON(safeData) { //At this point, we should have the JSON as a Swift Object.
                     
-                    //Now, what do we want to do with the weather Swift Object? Well...
+                    ///Now, what do we want to do with the weather Swift Object? Well...
                     
-                    //Send this weather object back to the WeatherViewController so we can use the data there to change the UI accordingly!
+                    ///Send this weather object back to the WeatherViewController so we can use the data there to change the UI accordingly!
                     
-                    //One method is to initialise the WeatherViewController here, and call a function that takes the weather object as one of its parameters (after creating it in the WeatherViewController). The disadvantage of this method is that it's not reusable.
+                    ///One method is to initialise the WeatherViewController here, and call a function that takes the weather object as one of its parameters (after creating it in the WeatherViewController). The disadvantage of this method is that it's not reusable.
                     
-                    //Hence the secoond method, use the delegate design pattern! Also worth noting, since Swift 5.3, Closures can now implicity refer to self if self is an instance of a struct (or enum), therefore in this case, that's why we don't need to write self.delegate.
+                    ///Hence the secoond method, use the delegate design pattern! Also worth noting, since Swift 5.3, Closures can now implicity refer to self if self is an instance of a struct (or enum), therefore in this case, that's why we don't need to write self.delegate.
                     
                     delegate?.didUpdateWeather(self, weather)
                     
@@ -100,7 +118,7 @@ struct WeatherManager {
             
         }
         
-        //Start the task.
+        ///Step 4 of networking: Start the task.
         task.resume()
         
     }
