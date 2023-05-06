@@ -173,13 +173,15 @@ extension WeatherViewController: UITextFieldDelegate {
 
 extension WeatherViewController: WeatherManagerDelegate {
     /**
-     This function comes from the WeatherManagerDelegate protocol, where in this conforming class we are providing the actual implemetation for the protocol requirements.
+     Tells the delegate that we have successfully parsed the JSON data from Open Weather, and its now available for use.
      
-     We wrap the code that modifies the UI with an asynchronous dispatch call to the main thread, because currently the UI is being updated on the background and not the main thread where it's suppose to be due to the UI using information from a completion handler, where completion handlers are done in the background thread. XCode's main threader tool will also warn us of this error.
+     We must wrap the code that modifies the UI with an asynchronous dispatch call to the main thread (which means move the task to the main thread), otherwise the UI would be updated on the background thread (UI must be updated on the main thread).
+     
+     Without the dispatchQueue.main.async, the UI would be updated on the background thread (which can cause UI unresponsiveness) because we used a completion handler to request the data (which takes time to execute, also it means our UI has become dependant on a background thread task to finish first), but completion handlers are done in the background thread. XCode's main threader tool will also warn us of this error. Therefore, we wrap the code that modifies the UI with an asynchronous dispatch call to the main thread.
      
      - parameter weatherManager: The identity of the object that calls this delegate method. It is an Apple naming convention to include this first parameter in your delegate methods. This also makes any properties available to the method.
      - parameter weather: The object that has the information (response) from openweather api as a Swift Object, (after decoding the JSON)
-     **/
+     */
     func didUpdateWeather(_ weatherManager:WeatherManager, _ weather: WeatherModel) {
         
         DispatchQueue.main.async {
@@ -189,12 +191,23 @@ extension WeatherViewController: WeatherManagerDelegate {
         }
         
     }
-    
+    /**
+    Tells the delegate that an error occured during the request from OpenWeather API. The request was unsuccessful.
+     
+    - parameter weatherManager: The object that calls the delegate method.
+    - parameter error: An error object that indicates why the request failed, or nil if the request was successful.
+     */
     func didFailWithError(_ weatherManager: WeatherManager, _ error: Error) {
         print("Request unsuccessful, error with request: \(error)")
     }
     
-    func didRecieveErrorWithResponse(_ weatherManager: WeatherManager, _ response: URLResponse) {
+    /**
+    Tells the delegate that an error occured with the https response when requesting data from OpenWeather API. The response was unacceptable.
+     
+    - parameter weatherManager: The object that calls the delegate method.
+    - parameter response: An object that provides response metadata, such as HTTP headers and status code. If you are making an HTTP or HTTPS request, the returned object is actually an HTTPURLResponse object.
+     */
+     func didRecieveErrorWithResponse(_ weatherManager: WeatherManager, _ response: URLResponse) {
         print("Error with the response, unexpected status code: \(response)")
     }
 }
