@@ -191,7 +191,11 @@ extension WeatherViewController: WeatherManagerDelegate {
     }
     
     func didFailWithError(_ weatherManager: WeatherManager, _ error: Error) {
-        print(error)
+        print("Request unsuccessful, error with request: \(error)")
+    }
+    
+    func didRecieveErrorWithResponse(_ weatherManager: WeatherManager, _ response: URLResponse) {
+        print("Error with the response, unexpected status code: \(response)")
     }
 }
 

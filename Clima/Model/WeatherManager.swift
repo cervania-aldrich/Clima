@@ -5,6 +5,7 @@ import CoreLocation
 protocol WeatherManagerDelegate {
     func didUpdateWeather(_ weatherManager:WeatherManager, _ weather:WeatherModel)
     func didFailWithError(_ weatherManager:WeatherManager, _ error: Error)
+    func didRecieveErrorWithResponse(_ weatherManager:WeatherManager, _ response: URLResponse)
 }
 
 ///A struct that handles the networking process. Requesting information from the api, and then using the native JSON decoder to parse that JSON file in a Swift Object. 
@@ -95,8 +96,10 @@ struct WeatherManager {
             
             let acceptableCodes = [200, 201, 202, 203, 304]
             
+            ///Helps to prevent runtime errors by ensuring the status codes are acceptable. We downcase the response as a HTTPURLResponse because we are using the https scheme in our request.
             guard let httpResponse = response as? HTTPURLResponse, acceptableCodes.contains(httpResponse.statusCode) else {
-                print("Error with the response, unexpected status code: \(response!)")
+                
+                delegate?.didRecieveErrorWithResponse(self, response!)
                 return
             }
             
