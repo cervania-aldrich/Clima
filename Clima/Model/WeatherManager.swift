@@ -27,7 +27,7 @@ struct WeatherManager {
                                    URLQueryItem(name: "appid", value: apiKey),
                                    URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
         
-        let urlString = urlComponent.url!.absoluteString
+        let urlString = urlComponent.url!.absoluteString //Reference to the URLComponents and Query Items as a String
         sendRequest(with: urlString)
         
     }
@@ -38,17 +38,17 @@ struct WeatherManager {
     /// - parameter lon: Refers to the longitude, retrieved by didUpdateLocations().
     func fetchWeather(_ lat:CLLocationDegrees, _ lon: CLLocationDegrees){
         
-        let latString = String(format: "%.2f", lat)
-        let lonString = String(format: "%.2f", lon)
+        let latString = String(format: "%.2f", lat) //A reference to the latitude as a String.
+        let lonString = String(format: "%.2f", lon) //A reference to the longitude as a String.
         
-        guard var urlComponent = URLComponents(string: weatherURL) else { return }
+        guard var urlComponent = URLComponents(string: weatherURL) else { return } //Create URL
         urlComponent.scheme = "https"
         urlComponent.queryItems = [URLQueryItem(name: "lat", value: latString),
                                    URLQueryItem(name: "lon", value: lonString),
                                    URLQueryItem(name: "appid", value: apiKey),
-                                   URLQueryItem(name: "units", value: unitOfMeasurement)]
-
-        let urlString = urlComponent.url!.absoluteString
+                                   URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
+ 
+        let urlString = urlComponent.url!.absoluteString //Reference to the URLComponents and Query Items as a String
         sendRequest(with: urlString)
         
     }
