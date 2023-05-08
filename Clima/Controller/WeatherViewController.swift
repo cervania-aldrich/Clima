@@ -38,9 +38,9 @@ class WeatherViewController: UIViewController {
     /**
      The function where location services are launched, and it is where we request authorization from the user and define the location service we want to use. Before we do so, it is good to check if location services are enabled by the users device and although this step isn't mandatory, it is still good to check.
      
-     The type of authorization we are requesting from the user is called "When in use" authorization, which means allowing access to location information when using the app
+     The type of authorization we are requesting from the user is called "When in use" authorization, which means allowing access to location information when using the app.
      
-     The type of location service we are using is the "requestLocation()." Note there are other location services we could use (see "running the standard location service" topic in CLLocationManager), but requestLocation is what we need for this app because we are only requesting one location, unlike a GPS which is requesting for multiple locations. Now with how apple has designed the Core Location framework, we don't directly access the location information directly from CLLocationManager, instead we use the didUpdateLocations delegate method (from CLLocationManagerDelegate) that contains location object(s) inside of it, and then we can write some code to handle those location objects. See the didUpdateLocations() to see how we handled those location objects!
+     The type of location service we are using is the "requestLocation()." Note there are other location services we could use (see "running the standard location service" topic in CLLocationManager docs), but requestLocation() is what we need for this app because we are only requesting one location, unlike a GPS which is requesting for multiple locations (in which case we should use startUpdatingLocations(), which is a method that constantly providing location updates). Now with how apple has designed the Core Location framework, we don't directly access the location information directly from CLLocationManager, instead we use the didUpdateLocations delegate method (from CLLocationManagerDelegate) that contains location object(s) inside of it, and then we can write some code to handle those location objects. See the didUpdateLocations() to see how we handled those location objects!
      */
     @IBAction func locationButtonPressed(_ sender: UIButton) {
         
@@ -92,7 +92,7 @@ extension WeatherViewController: CLLocationManagerDelegate {
     /**
      This delegate method is associated with the requestLocation() method, and it is called at requestLocation(). This is where we directly have access to the location information. It's in the locations parameter!
      
-     In the location object we have access to numerous properties, but the properties we want access are the latitude and longitude properties. This is because in our API request, the URL requires a lat and lon query so that we can search for a particular city at those coordinates.
+     In the location object we have access to numerous properties, but the properties we want access are the latitude and longitude properties. This is because in our API request, the URL requires a lat and lon query so that we can search for a particular city at those coordinates. After we have a reference to the lat and lon, we shall pass this to the weatherManager, which will do all the networking.
      
      - parameter locations: An array of location objects. The objects in the array are organized in the order in which they occurred. Therefore, the most recent location update is at the end of the array.
      */
@@ -124,7 +124,7 @@ extension WeatherViewController: UITextFieldDelegate {
     }
     
     /**
-     A function that defines the behaviour when the user has pressed the return key on the iPhone keyboard (Pressing enter on the keyboard).
+     Tells the delegate when the user has pressed the return key on the iPhone keyboard.
      
      We return true, because we want to process the search key, and run this function. Which means, this behaviour is analogous to having an IBAction to that return button.
      */
@@ -133,7 +133,7 @@ extension WeatherViewController: UITextFieldDelegate {
         return true
     }
     
-    ///A function that defines the behaviour the the textField on screen are done with editing. (Called using .endEditing method). This is the ideal place to search for the weather of a city.
+    ///Tells the delegate that the textFieldon screen is done with editing, and it is the ideal place to search for the weather of a city in our app. It is also associated with the .endEnding method.
     func textFieldDidEndEditing(_ textField: UITextField) {
         
         //Search the weather for the city entered in the textField.
@@ -145,7 +145,7 @@ extension WeatherViewController: UITextFieldDelegate {
     }
     
     /**
-     A function that defines the behaviour when the user tries to deselect the textField.
+     Tells the delegate when the user has tried to deselect the textField.
      
      This function is useful for validating what the user has typed, so we don't just trap the user in editing mode.
      

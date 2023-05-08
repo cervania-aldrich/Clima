@@ -85,7 +85,7 @@ struct WeatherManager {
          
         Once we have successfully parsed the JSON data and stored it as a Swift Object (namely the Weather Model), we will use the data in this model to change the UI of our app.
          
-         Just in case there was an error that occured, we shall capture that error and pass it to the WeatherManagerDelegate. Additionally, if there was a non-acceptable HTTP response code (values that aren't in the acceptableCodes array, we shall pass this information to the WeatherManagerDelegate too.
+         Just in case there was an error that occured, we shall capture that error and pass it to the WeatherManagerDelegate. Additionally, if there was a non-acceptable HTTP response code (values that aren't in the acceptableCodes array), we shall pass this information to the WeatherManagerDelegate too.
         */
         let task = session.dataTask(with: url) { data, response, error in //Perform the task using the URL we created from step 1, and execute the completion handler.
             
@@ -130,7 +130,7 @@ struct WeatherManager {
      The function to parse the JSON formatted data retrieved from openweatherapi.
      
      In order to successfully parse JSON formatted data, we must:
-     1. Inform our complier of how the data is structured. (Create a struct for that data natvely)
+     1. Inform our complier of how the data is structured. (Create a struct for that data natively, and it must conform to the decodable protocol)
      2. Create JSON decoder object.
      3. Use decode method. Note that the first parmeter requires the type of the data itself, not the name of the type. The second parameter is the data we want to encode.
      4. decode can throw, which means we must mark it with a try keyword, and a do/catch block. Also it returns, so store a variable to this result. (Also, try to print out the decoded data to the console to test if the data is accurate and if the code works so far).
