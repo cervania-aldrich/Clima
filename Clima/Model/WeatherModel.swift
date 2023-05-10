@@ -13,37 +13,37 @@ struct WeatherModel {
         
         switch conditionID {
         case 200...232:
-            return "cloud.bolt"
+            return Constants.Conditions.cloudBolt
             
         case 300...321:
-            return "cloud.drizzle"
+            return Constants.Conditions.cloudBolt
             
         case 500...531, 771:
-            return "cloud.rain"
+            return Constants.Conditions.cloudRain
             
         case 600...622:
-            return "cloud.snow"
+            return Constants.Conditions.cloudSnow
             
         case 701, 741...751:
-            return "cloud.fog"
+            return Constants.Conditions.cloudFog
         
         case 711:
-            return "smoke"
+            return Constants.Conditions.smoke
             
         case 721:
-            return "sun.haze"
+            return Constants.Conditions.sunHaze
             
         case 731, 761:
-            return "sun.dust"
+            return Constants.Conditions.sunDust
             
         case 781:
-            return "tornado"
+            return Constants.Conditions.tornado
             
         case 801...804:
-            return "cloud"
+            return Constants.Conditions.cloud
             
         default:
-            return "sun.max"
+            return Constants.Conditions.sun
         }
         
     }
