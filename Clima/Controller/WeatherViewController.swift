@@ -163,7 +163,7 @@ extension WeatherViewController: UITextFieldDelegate {
         if textField.text != "" {
             return true //We want to endEditing when the textField as an input.
         } else {
-            textField.placeholder = "Please enter a city name"
+            textField.placeholder = Constants.locationPlaceholder
             return false //Keep the keyboard where it is until the user as entered a city name.
         }
     }

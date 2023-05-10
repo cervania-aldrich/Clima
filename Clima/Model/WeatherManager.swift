@@ -13,19 +13,19 @@ struct WeatherManager {
     
     var delegate: WeatherManagerDelegate?
     
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather"
-    let apiKey = "a210b6f91c665d2db9eb566589c6c2aa"
-    let unitOfMeasurement = "metric"
+    let weatherURL = Constants.Url.weatherURL
+    let apiKey = Constants.Url.apiKey
+    let unitOfMeasurement = Constants.Url.metric
     
     func fetchWeather(for cityName:String){
         
         //URLComponents already contains the proper percent encoding. Using this object results in more safe code for networking.
         
         guard var urlComponent = URLComponents(string: weatherURL) else { return } //Create URL
-        urlComponent.scheme = "https"
-        urlComponent.queryItems = [URLQueryItem(name: "q", value: cityName),
-                                   URLQueryItem(name: "appid", value: apiKey),
-                                   URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
+        urlComponent.scheme = Constants.Url.scheme
+        urlComponent.queryItems = [URLQueryItem(name: Constants.Url.Query.cityName, value: cityName),
+                                   URLQueryItem(name: Constants.Url.Query.apiID, value: apiKey),
+                                   URLQueryItem(name: Constants.Url.Query.units, value: unitOfMeasurement)] //Create queries, and add them to the URL.
         
         let urlString = urlComponent.url!.absoluteString //Reference to the URLComponents and Query Items as a String
         sendRequest(with: urlString)
@@ -42,11 +42,11 @@ struct WeatherManager {
         let lonString = String(format: "%.2f", lon) //A reference to the longitude as a String.
         
         guard var urlComponent = URLComponents(string: weatherURL) else { return } //Create URL
-        urlComponent.scheme = "https"
-        urlComponent.queryItems = [URLQueryItem(name: "lat", value: latString),
-                                   URLQueryItem(name: "lon", value: lonString),
-                                   URLQueryItem(name: "appid", value: apiKey),
-                                   URLQueryItem(name: "units", value: unitOfMeasurement)] //Create queries, and add them to the URL.
+        urlComponent.scheme = Constants.Url.scheme
+        urlComponent.queryItems = [URLQueryItem(name: Constants.Url.Query.latitude, value: latString),
+                                   URLQueryItem(name: Constants.Url.Query.longitude, value: lonString),
+                                   URLQueryItem(name: Constants.Url.Query.apiID, value: apiKey),
+                                   URLQueryItem(name: Constants.Url.Query.units, value: unitOfMeasurement)] //Create queries, and add them to the URL.
  
         let urlString = urlComponent.url!.absoluteString //Reference to the URLComponents and Query Items as a String
         sendRequest(with: urlString)
