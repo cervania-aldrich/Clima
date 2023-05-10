@@ -14,7 +14,7 @@ struct WeatherManager {
     var delegate: WeatherManagerDelegate?
     
     let weatherURL = Constants.Url.weatherURL
-    let apiKey = Constants.Url.apiKey
+    let apiKey = ConstantAPIKey.apiKey
     let unitOfMeasurement = Constants.Url.metric
     
     func fetchWeather(for cityName:String){

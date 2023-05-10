@@ -5,7 +5,6 @@ struct Constants {
     
     struct Url {
         static let weatherURL = "https://api.openweathermap.org/data/2.5/weather?&units=metric&"
-        static let apiKey = "a210b6f91c665d2db9eb566589c6c2aa" //Please insert your API key from OpenWeather API here.U
         static let scheme = "https"
         static let metric = "metric"
         
